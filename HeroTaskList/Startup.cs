@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using GraphQL;
+using GraphQL.Server;
+using GraphQL.Server.Ui.Playground;
 using HeroTaskList.EntityFramework;
+using HeroTaskList.GraphQL;
+using HeroTaskList.Repositories;
+using HeroTaskList.Repository_Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace HeroTaskList
 {
@@ -28,7 +28,16 @@ namespace HeroTaskList
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.AddScoped<IHeroTaskListDbContext, HeroTaskListDbContext>();
             services.AddScoped<IDbContextSeeder, DbContextSeeder>();
-            services.AddMvc();
+            services.AddScoped<HeroTaskListSchema>();
+            services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(
+                s.GetRequiredService));
+            services.AddGraphQL(o => { o.ExposeExceptions = true; })
+                .AddGraphTypes(ServiceLifetime.Scoped)
+                .AddUserContextBuilder(httpContext => httpContext.User)
+                .AddDataLoader()
+                .AddWebSockets();
+            services.AddCors();
             services.AddDbContext<HeroTaskListDbContext>(opts => opts.UseSqlServer(Configuration["ConnectionStrings:HeroTaskListDB"]));
         }
 
@@ -36,13 +45,16 @@ namespace HeroTaskList
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IHeroTaskListDbContext dbContext,
             IDbContextSeeder contextSeeder)
         {
+            app.UseWebSockets();
+            app.UseGraphQLWebSockets<HeroTaskListSchema>("/graphql");
+            app.UseGraphQL<HeroTaskListSchema>();
             dbContext.Migrate();
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
             contextSeeder.Seed(dbContext);
         }
     }
