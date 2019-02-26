@@ -28,7 +28,8 @@ namespace HeroTaskList.Repositories
         public async Task<ILookup<int, AssignmentStatus>> GetStatusForAssignments(IEnumerable<int> taskIds)
         {
             var statuses = await _dbContext.Assignments.Where(p => taskIds.Contains(p.Id)).Select(p => p.Status).ToListAsync();
-            return statuses.ToLookup(r => r.Id);
+            var final  = statuses.ToLookup(r => r.Id);
+            return final;
         }
     }
 }
