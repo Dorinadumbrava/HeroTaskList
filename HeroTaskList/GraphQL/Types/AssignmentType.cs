@@ -1,4 +1,6 @@
-﻿using GraphQL.DataLoader;
+﻿using System;
+using System.Collections.Generic;
+using GraphQL.DataLoader;
 using GraphQL.Types;
 using HeroTaskList.Entities;
 using HeroTaskList.Repository_Interfaces;
@@ -8,7 +10,8 @@ namespace HeroTaskList.GraphQL.Types
     public class AssignmentType: ObjectGraphType<Assignment>
     {
         public AssignmentType(IAssignmentRepository assignmentRepository, IDataLoaderContextAccessor dataLoader, 
-            IAssignmentStatusRepository statusRepository, ICategoryRepository categoryRepository)
+            IAssignmentStatusRepository statusRepository, ICategoryRepository categoryRepository,
+            ISubTaskRepository subTaskRepository)
         {
             Field(t => t.Id);
             Field(t => t.Name);
@@ -31,6 +34,19 @@ namespace HeroTaskList.GraphQL.Types
                         "GetCategory", categoryRepository.GetCategoryForAssignments);
                     return loader.LoadAsync(context.Source.Id);
                 });
+            Field<ListGraphType<SubTaskType>, IEnumerable<SubTask>>()
+                .Name("SubTasks")
+                .ResolveAsync(context =>
+               {
+                   var loader = dataLoader.Context.GetOrAddCollectionBatchLoader<int, SubTask>(
+                       "GetSubTasks", subTaskRepository.GetSubTasksForAssignments);
+                   return loader.LoadAsync(context.Source.Id);
+               });
+        }
+
+        private object IEnumerable<T>()
+        {
+            throw new NotImplementedException();
         }
     }
 }

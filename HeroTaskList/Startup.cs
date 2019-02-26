@@ -32,6 +32,7 @@ namespace HeroTaskList
             services.AddScoped<IAssignmentRepository, AssignmentRepository>();
             services.AddScoped<IAssignmentStatusRepository, AssignmentStatusRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ISubTaskRepository, SubTaskRepository>();
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(
                 s.GetRequiredService));
             services.AddGraphQL(o => { o.ExposeExceptions = true; })
