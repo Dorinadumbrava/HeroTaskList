@@ -7,7 +7,8 @@ namespace HeroTaskList.GraphQL.Types
 {
     public class AssignmentType: ObjectGraphType<Assignment>
     {
-        public AssignmentType(IAssignmentRepository assignmentRepository, IDataLoaderContextAccessor dataLoader)
+        public AssignmentType(IAssignmentRepository assignmentRepository, IDataLoaderContextAccessor dataLoader, 
+            IAssignmentStatusRepository statusRepository, ICategoryRepository categoryRepository)
         {
             Field(t => t.Id);
             Field(t => t.Name);
@@ -19,7 +20,15 @@ namespace HeroTaskList.GraphQL.Types
                 resolve: context =>
                 {
                     var loader = dataLoader.Context.GetOrAddCollectionBatchLoader<int, AssignmentStatus>(
-                        "GetStatus", assignmentRepository.GetStatusForAssignments);
+                        "GetStatus", statusRepository.GetStatusForAssignments);
+                    return loader.LoadAsync(context.Source.Id);
+                });
+            Field<ListGraphType<CategoryType>>(
+                "TaskCategory",
+                resolve: context =>
+                {
+                    var loader = dataLoader.Context.GetOrAddCollectionBatchLoader<int, Category>(
+                        "GetCategory", categoryRepository.GetCategoryForAssignments);
                     return loader.LoadAsync(context.Source.Id);
                 });
         }

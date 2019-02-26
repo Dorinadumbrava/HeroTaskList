@@ -30,6 +30,8 @@ namespace HeroTaskList
             services.AddScoped<IDbContextSeeder, DbContextSeeder>();
             services.AddScoped<HeroTaskListSchema>();
             services.AddScoped<IAssignmentRepository, AssignmentRepository>();
+            services.AddScoped<IAssignmentStatusRepository, AssignmentStatusRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(
                 s.GetRequiredService));
             services.AddGraphQL(o => { o.ExposeExceptions = true; })

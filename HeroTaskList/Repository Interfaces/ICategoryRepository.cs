@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace HeroTaskList.Repository_Interfaces
 {
-    public interface IAssignmentRepository
+    public interface ICategoryRepository
     {
-        IEnumerable<Assignment> GetAll();
-        AssignmentStatus GetAssignmentStatus(int taskId);
+        Task<ILookup<int, Category>> GetCategoryForAssignments(IEnumerable<int> taskIds);
     }
 }
