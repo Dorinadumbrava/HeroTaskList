@@ -4,6 +4,7 @@ using HeroTaskList.Repository_Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeroTaskList.Repositories
@@ -21,10 +22,9 @@ namespace HeroTaskList.Repositories
             return _dbContext.Statuses;
         }
 
-        public async Task<ILookup<int, AssignmentStatus>> GetStatusForAssignments(IEnumerable<int> taskIds)
+        public async Task<IDictionary<int, AssignmentStatus>> GetStatusForAssignments(IEnumerable<int> taskIds, CancellationToken cancellationToken)
         {
-            var statuses = await _dbContext.Assignments.Where(p => taskIds.Contains(p.Id)).Select(p => p.Status).ToListAsync();
-            return statuses.ToLookup(r => r.Id);
+            return await _dbContext.Assignments.Where(p => taskIds.Contains(p.Id)).Select(p => p.Status).ToDictionaryAsync(x => x.Id);
         }
     }
 }

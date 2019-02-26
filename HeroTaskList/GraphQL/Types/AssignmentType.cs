@@ -15,19 +15,19 @@ namespace HeroTaskList.GraphQL.Types
             Field(t => t.Description);
             Field(t => t.DueDate);
             Field(t => t.Important);
-            Field<ListGraphType<StatusType>>(
-                "TaskStatus",
-                resolve: context =>
+            Field<StatusType, AssignmentStatus>()
+                .Name("TaskStatus")
+                .ResolveAsync(ctx =>
                 {
-                    var loader = dataLoader.Context.GetOrAddCollectionBatchLoader<int, AssignmentStatus>(
+                    var loader = dataLoader.Context.GetOrAddBatchLoader<int, AssignmentStatus>(
                         "GetStatus", statusRepository.GetStatusForAssignments);
-                    return loader.LoadAsync(context.Source.Id);
+                    return loader.LoadAsync(ctx.Source.Id);
                 });
-            Field<ListGraphType<CategoryType>>(
-                "TaskCategory",
-                resolve: context =>
+            Field<CategoryType, Category>()
+                .Name("TaskCategory")
+                .ResolveAsync( context =>
                 {
-                    var loader = dataLoader.Context.GetOrAddCollectionBatchLoader<int, Category>(
+                    var loader = dataLoader.Context.GetOrAddBatchLoader<int, Category>(
                         "GetCategory", categoryRepository.GetCategoryForAssignments);
                     return loader.LoadAsync(context.Source.Id);
                 });

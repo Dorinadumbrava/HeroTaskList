@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HeroTaskList.Repositories
@@ -17,10 +18,9 @@ namespace HeroTaskList.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<ILookup<int, Category>> GetCategoryForAssignments(IEnumerable<int> taskIds)
+        public async Task<IDictionary<int, Category>> GetCategoryForAssignments(IEnumerable<int> taskIds, CancellationToken cancellationToken)
         {
-            var categories = await _dbContext.Assignments.Where(p => taskIds.Contains(p.Id)).Select(p => p.Category).ToListAsync();
-            return categories.ToLookup(r => r.Id);
+            return await _dbContext.Assignments.Where(p => taskIds.Contains(p.Id)).Select(p => p.Category).ToDictionaryAsync(a => a.Id);
         }
     }
 }
