@@ -1,4 +1,5 @@
 ﻿using GraphQL;
+using GraphiQl;
 using GraphQL.Server;
 using GraphQL.Server.Ui.Playground;
 using HeroTaskList.EntityFramework;
@@ -33,6 +34,7 @@ namespace HeroTaskList
             services.AddScoped<IAssignmentStatusRepository, AssignmentStatusRepository>();
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<ISubTaskRepository, SubTaskRepository>();
+            services.AddScoped<IDocumentExecuter, DocumentExecuter>();
             services.AddScoped<IDependencyResolver>(s => new FuncDependencyResolver(
                 s.GetRequiredService));
             services.AddGraphQL(o => { o.ExposeExceptions = true; })
@@ -48,6 +50,7 @@ namespace HeroTaskList
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IHeroTaskListDbContext dbContext,
             IDbContextSeeder contextSeeder)
         {
+            app.UseGraphiQl("/graphql");
             app.UseWebSockets();
             app.UseGraphQLWebSockets<HeroTaskListSchema>("/graphql");
             app.UseGraphQL<HeroTaskListSchema>();
@@ -56,7 +59,6 @@ namespace HeroTaskList
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
             contextSeeder.Seed(dbContext);
         }

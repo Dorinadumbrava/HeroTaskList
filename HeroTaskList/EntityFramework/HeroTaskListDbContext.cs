@@ -1,4 +1,5 @@
-﻿using HeroTaskList.Entities;
+﻿using System.Threading.Tasks;
+using HeroTaskList.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace HeroTaskList.EntityFramework
@@ -34,6 +35,5 @@ namespace HeroTaskList.EntityFramework
         {
             Database.Migrate();
         }
-        
     }
 }

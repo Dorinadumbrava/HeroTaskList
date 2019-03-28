@@ -1,9 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HeroTaskList.GraphQL
 {
@@ -12,6 +8,7 @@ namespace HeroTaskList.GraphQL
         public HeroTaskListSchema(IDependencyResolver resolver): base(resolver)
         {
             Query = resolver.Resolve<HeroTaskListQuery>();
+            Mutation = resolver.Resolve<HeroTaskListMutation>();
         }
     }
 }

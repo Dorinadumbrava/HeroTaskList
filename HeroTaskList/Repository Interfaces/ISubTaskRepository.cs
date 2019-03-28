@@ -8,5 +8,6 @@ namespace HeroTaskList.Repository_Interfaces
     public interface ISubTaskRepository
     {
         Task<ILookup<int, SubTask>> GetSubTasksForAssignments(IEnumerable<int> taskIds);
+        Task<SubTask> AddSubtask(SubTask subTask);
     }
 }
